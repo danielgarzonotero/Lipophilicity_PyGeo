@@ -1,10 +1,10 @@
 from collections import defaultdict
 import numpy as np
+
 import torch
 from torch_geometric.data import Data
 
 from rdkit import Chem
-
 from sklearn.preprocessing import OneHotEncoder
 
 
@@ -132,8 +132,6 @@ def get_edge_indices(molecule):
     return torch.tensor(edges,dtype=torch.long)
 
 
-
-     
 ''' lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'] 
 molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
  '''
@@ -147,11 +145,9 @@ molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
  '''
  
 ''' features = get_atom_features(lista_smile)
-edges_features = get_edge_indices(molecule)
 
 print(features) 
-print(edges_features)
-
+p
 num_keys = len(features)
 print("Número de claves en el diccionario:", num_keys)
 value_dims = [len(value) for value in features.values()]
