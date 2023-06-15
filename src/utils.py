@@ -39,12 +39,14 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
     return geo_dp
 
 def get_atom_features(smile_list):
+    #nodes
     atomic_number = []
     aromaticity = []
     num_bonds = []
     bonded_hydrogens = []
     hybridization = []
     
+    #edges
     bond_type = []
     in_ring = []
     
@@ -83,7 +85,6 @@ def get_atom_features(smile_list):
     codificador_hybrid.fit(np.array(hybrid_set).reshape(-1,1))
     
     #edges
-    
     bond_type_set = list(set(bond_type))
     codificador_bond_type = OneHotEncoder()
     codificador_bond_type.fit(np.array(bond_type_set).reshape(-1,1))
@@ -91,9 +92,9 @@ def get_atom_features(smile_list):
     in_ring_set = list(set(in_ring))
     codificador_in_ring= OneHotEncoder()
     codificador_in_ring.fit(np.array(in_ring_set).reshape(-1,1))
-    
-    
+
     features_dict = defaultdict(list)
+    edge_features_dict = defaultdict(list)
     
     for atom, aromatic, bonds, hydrogen, hybrid in zip(atomic_number, aromaticity, num_bonds, bonded_hydrogens, hybridization):
         node_key_features_combined = f"{atom}_{aromatic}_{bonds}_{hydrogen}_{hybrid}"
@@ -106,8 +107,6 @@ def get_atom_features(smile_list):
         
         feature_node = np.concatenate((atomic_feature, aromatic_feature, bonds_feature, hydrogen_feature, hybrid_feature))
         features_dict[node_key_features_combined] = feature_node
-    
-    edge_features_dict = defaultdict(list)
     
     for bond, ring in zip(bond_type, in_ring):
     
@@ -132,9 +131,9 @@ def get_edge_indices(molecule):
     return torch.tensor(edges,dtype=torch.long)
 
 
-''' lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'] 
-molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
- '''
+#lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'] 
+#molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
+
 ''' lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
                'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
                'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
@@ -147,7 +146,6 @@ molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
 ''' features = get_atom_features(lista_smile)
 
 print(features) 
-p
 num_keys = len(features)
 print("Número de claves en el diccionario:", num_keys)
 value_dims = [len(value) for value in features.values()]

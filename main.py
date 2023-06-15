@@ -1,3 +1,4 @@
+
 #%%
 import time
 import matplotlib.pyplot as plt
@@ -53,7 +54,7 @@ val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
 torch.manual_seed(0)
 
 # Set up model:
-model =  GCN_Geo(initial_dim_gcn = dataset.num_features, 
+model =  GCN_Geo(initial_dim_gcn = dataset.num_features, edge_dim_feature = dataset.num_edge_features
                  ).to(device)
 
 # Set up optimizer:

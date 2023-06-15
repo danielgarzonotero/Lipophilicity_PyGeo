@@ -5,7 +5,43 @@ from torch_geometric.nn import GCNConv, GATConv, NNConv
 from torch_geometric.nn import aggr
 
 class GCN_Geo(torch.nn.Module):
-    def __init__(self, initial_dim_gcn, 
+    def __init__(self, 
+                 initial_dim_gcn, 
+                 edge_dim_feature,
+                 hidden_dim_nn_1=500,
+                 hidden_dim_nn_2=200,
+                 hidden_dim_fcn_1=100):
+        super(GCN_Geo, self).__init__()
+
+        self.nn_conv_1 = NNConv(initial_dim_gcn, hidden_dim_nn_1,
+                                nn=torch.nn.Sequential(torch.nn.Linear(edge_dim_feature, initial_dim_gcn * hidden_dim_nn_1)), aggr='add' )
+        self.nn_conv_2 = NNConv(hidden_dim_nn_1, hidden_dim_nn_2,
+                                nn=torch.nn.Sequential(torch.nn.Linear(edge_dim_feature, hidden_dim_nn_1 * hidden_dim_nn_2)), aggr='add')
+
+        self.readout = aggr.SumAggregation()
+
+        self.linear1 = nn.Linear(hidden_dim_nn_2, hidden_dim_fcn_1)
+        self.linear2 = nn.Linear(hidden_dim_fcn_1, 1)
+
+    def forward(self, data):
+        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
+
+        x = self.nn_conv_1(x, edge_index, edge_attr)
+        x = F.relu(x)
+        x = self.nn_conv_2(x, edge_index, edge_attr)
+        x = F.relu(x)
+
+        x = self.readout(x, data.batch)
+
+        x = self.linear1(x)
+        x = F.relu(x)
+        x = self.linear2(x)
+
+        return x.view(-1,)
+
+
+''' class GCN_Geo(torch.nn.Module):
+    def __init__(self, initial_dim_gcn=25, 
                 hidden_dim_gat_1 = 500,
                 hidden_dim_gat_2 = 300,
                  hidden_dim_fcn_1 = 100,
@@ -37,7 +73,7 @@ class GCN_Geo(torch.nn.Module):
         x = self.linear2(x)
         
         return x.view(-1,)
-
+ '''
 
 
 ''' import torch
