@@ -110,7 +110,7 @@ def get_atom_features(smile_list):
     
     for bond, ring in zip(bond_type, in_ring):
     
-        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}"
+        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}" #TODO
         bond_feature = codificador_bond_type.transform([[bond]]).toarray()[0]
         ring_feature = codificador_in_ring.transform([[ring]]).toarray()[0]
         

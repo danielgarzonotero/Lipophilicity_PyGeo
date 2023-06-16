@@ -37,7 +37,7 @@ n_val = len(dataset) - n_train
 
 # # Define pytorch training and validation set objects:
 train_set, val_set = torch.utils.data.random_split(
-    dataset, [n_train, n_val], generator=torch.Generator().manual_seed(42) #TODO ???
+    dataset, [n_train, n_val], generator=torch.Generator().manual_seed(42) #TODO 
 )
 
 # # Build pytorch training and validation set dataloaders:
@@ -54,18 +54,19 @@ val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
 torch.manual_seed(0)
 
 # Set up model:
-model =  GCN_Geo(initial_dim_gcn = dataset.num_features, edge_dim_feature = dataset.num_edge_features
+model =  GCN_Geo(initial_dim_gcn = dataset.num_features
+                , edge_dim_feature = dataset.num_edge_features
                  ).to(device)
 
 # Set up optimizer:
-learning_rate = 1e-5
+learning_rate = 1e-4
 optimizer = optim.Adam(model.parameters(), learning_rate)
 
 train_losses = []
 val_losses = []
 
 Sstart_time = time.time()
-for epoch in range(1, 30): #TODO
+for epoch in range(1, 300): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
     train_losses.append(train_loss)
@@ -96,7 +97,7 @@ mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
 rmse = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
 r, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
 
-legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, mae, rmse, r * 100)
+legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, r * 100, mae, rmse)
 
 plt.figure(figsize=(4, 4), dpi=100)
 plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
@@ -118,7 +119,7 @@ mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
 rmse = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
 r, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
 
-legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, mae, rmse, r * 100)
+legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, r * 100, mae, rmse)
 
 plt.figure(figsize=(4, 4), dpi=100)
 plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
