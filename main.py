@@ -1,5 +1,6 @@
 
-#%%
+#%% 
+
 import time
 import matplotlib.pyplot as plt
 import torch
@@ -30,7 +31,7 @@ print('Number of EDGES features: ', dataset.num_edge_features)
 
 
 # # Number of datapoints in the training set:
-n_train = int(len(dataset) * 0.6)
+n_train = int(len(dataset) * 0.8)
 
 # # Number of datapoints in the validation set:
 n_val = len(dataset) - n_train
@@ -41,7 +42,7 @@ train_set, val_set = torch.utils.data.random_split(
 )
 
 # # Build pytorch training and validation set dataloaders:
-batch_size = 100
+batch_size = 50
 dataloader = DataLoader(dataset, batch_size, shuffle=True)
 
 
@@ -59,14 +60,14 @@ model =  GCN_Geo(initial_dim_gcn = dataset.num_features
                  ).to(device)
 
 # Set up optimizer:
-learning_rate = 1e-4
+learning_rate = 1e-3
 optimizer = optim.Adam(model.parameters(), learning_rate)
 
 train_losses = []
 val_losses = []
 
 Sstart_time = time.time()
-for epoch in range(1, 300): #TODO
+for epoch in range(1, 200): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
     train_losses.append(train_loss)
@@ -97,7 +98,7 @@ mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
 rmse = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
 r, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
 
-legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, r * 100, mae, rmse)
+legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2, r , mae, rmse)
 
 plt.figure(figsize=(4, 4), dpi=100)
 plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
@@ -119,7 +120,7 @@ mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
 rmse = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
 r, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
 
-legend_text = "R2 Score: {:.4f}%\nR Pearson: {:.4f}%\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2 * 100, r * 100, mae, rmse)
+legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2, r , mae, rmse)
 
 plt.figure(figsize=(4, 4), dpi=100)
 plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)

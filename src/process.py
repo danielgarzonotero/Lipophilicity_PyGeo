@@ -5,7 +5,7 @@ def train(model, device, dataloader, optim, epoch):
     
     model.train()
     
-    loss_func = torch.nn.L1Loss(reduction='sum') 
+    loss_func = torch.nn.MSELoss(reduction='sum') 
     loss_collect = 0
 
     # Looping over the dataloader allows us to pull out or input/output data:
@@ -45,7 +45,7 @@ def validation(model, device, dataloader, epoch):
 
     model.eval()
     loss_collect = 0
-    loss_func = torch.nn.L1Loss(reduction='sum') 
+    loss_func = torch.nn.MSELoss(reduction='sum') 
         
     # Remove gradients:
     with torch.no_grad():
