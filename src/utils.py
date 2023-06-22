@@ -21,15 +21,17 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
                           for atomic, aromatic, bonds, hydrogen, hybrid 
                           in zip(atomic_number, aromaticity, num_bonds, bonded_hydrogens, hybridization)]
     
-    nodes_features = torch.tensor(np.array([node_features_dict[x] for x in node_keys_features]), dtype=torch.float32)
-    
     edge_key_features = []
     for bond in molecule.GetBonds():
         bond_type = bond.GetBondTypeAsDouble()
         in_ring = int(bond.IsInRing())
-        edge_key_features.append(f"{bond_type:.1f}_{in_ring:.1f}") #TODO aqui es para garantizar que la clave de ring tenga un decimal
+        conjugated = int(bond.GetIsConjugated())
+        stereo = int(bond.GetStereo())
+        
+        edge_key_features.append(f"{bond_type:.1f}_{in_ring:.1f}_{conjugated:.1f}_{stereo:.1f}") #TODO aqui es para garantizar que la clave de ring tenga un decimal
                                                                 #no se por que el diccionario se genera con un decimal
     
+    nodes_features = torch.tensor(np.array([node_features_dict[x] for x in node_keys_features]), dtype=torch.float32)
     edges_features = torch.tensor(np.array([edge_features_dict[x] for x in edge_key_features]), dtype=torch.float32)  
     
     edges = get_edge_indices(molecule)
@@ -49,6 +51,8 @@ def get_atom_features(smile_list):
     #edges
     bond_type = []
     in_ring = []
+    conjugated = []
+    stereo = []
     
     for smi in smile_list:
         molecule = Chem.MolFromSmiles(smi)
@@ -62,6 +66,8 @@ def get_atom_features(smile_list):
         for bond in molecule.GetBonds():
             bond_type.extend([bond.GetBondTypeAsDouble()])
             in_ring.extend([int(bond.IsInRing())])
+            conjugated.extend([int(bond.GetIsConjugated())])
+            stereo.extend([int(bond.GetStereo())])
             
     #nodes
     atomic_set = list(set(atomic_number))
@@ -92,6 +98,14 @@ def get_atom_features(smile_list):
     in_ring_set = list(set(in_ring))
     codificador_in_ring= OneHotEncoder()
     codificador_in_ring.fit(np.array(in_ring_set).reshape(-1,1))
+    
+    conjugated_set = list(set(conjugated))
+    codificador_conjugated= OneHotEncoder()
+    codificador_conjugated.fit(np.array(conjugated_set).reshape(-1,1))
+    
+    stereo_set = list(set(stereo))
+    codificador_stereo= OneHotEncoder()
+    codificador_stereo.fit(np.array(stereo_set).reshape(-1,1))
 
     features_dict = defaultdict(list)
     edge_features_dict = defaultdict(list)
@@ -108,13 +122,15 @@ def get_atom_features(smile_list):
         feature_node = np.concatenate((atomic_feature, aromatic_feature, bonds_feature, hydrogen_feature, hybrid_feature))
         features_dict[node_key_features_combined] = feature_node
     
-    for bond, ring in zip(bond_type, in_ring):
-    
-        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}" #TODO
+    for bond, ring, conjugat, ster in zip(bond_type, in_ring, conjugated, stereo):
+        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}_{conjugat:.1f}_{ster:.1f}" #TODO
+        
         bond_feature = codificador_bond_type.transform([[bond]]).toarray()[0]
         ring_feature = codificador_in_ring.transform([[ring]]).toarray()[0]
-        
-        feature_edge = np.concatenate((bond_feature, ring_feature))
+        conjugated_feature = codificador_conjugated.transform([[conjugat]]).toarray()[0]
+        stereo_feature = codificador_stereo.transform([[ster]]).toarray()[0]   
+            
+        feature_edge = np.concatenate((bond_feature, ring_feature, conjugated_feature, stereo_feature))
         edge_features_dict[edge_key_features_combined] = feature_edge
         
     
