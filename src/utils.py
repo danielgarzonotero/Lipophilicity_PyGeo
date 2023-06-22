@@ -28,8 +28,7 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
         conjugated = int(bond.GetIsConjugated())
         stereo = int(bond.GetStereo())
         
-        edge_key_features.append(f"{bond_type:.1f}_{in_ring:.1f}_{conjugated:.1f}_{stereo:.1f}") #TODO aqui es para garantizar que la clave de ring tenga un decimal
-                                                                #no se por que el diccionario se genera con un decimal
+        edge_key_features.append(f"{bond_type:.1f}_{in_ring:.1f}_{conjugated:.1f}_{stereo:.1f}") 
     
     nodes_features = torch.tensor(np.array([node_features_dict[x] for x in node_keys_features]), dtype=torch.float32)
     edges_features = torch.tensor(np.array([edge_features_dict[x] for x in edge_key_features]), dtype=torch.float32)  
@@ -123,7 +122,7 @@ def get_atom_features(smile_list):
         features_dict[node_key_features_combined] = feature_node
     
     for bond, ring, conjugat, ster in zip(bond_type, in_ring, conjugated, stereo):
-        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}_{conjugat:.1f}_{ster:.1f}" #TODO
+        edge_key_features_combined = f"{bond:.1f}_{ring:.1f}_{conjugat:.1f}_{ster:.1f}" 
         
         bond_feature = codificador_bond_type.transform([[bond]]).toarray()[0]
         ring_feature = codificador_in_ring.transform([[ring]]).toarray()[0]
@@ -147,8 +146,6 @@ def get_edge_indices(molecule):
     return torch.tensor(edges,dtype=torch.long)
 
 
-#lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'] 
-#molecule = Chem.MolFromSmiles('Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14')
 
 ''' lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
                'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
